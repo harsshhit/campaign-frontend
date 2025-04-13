@@ -1,28 +1,69 @@
+:root {
+  --gradient-1: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --gradient-2: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  min-height: 100vh;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
-.logo {
-  height: 4em;
-  padding: 1em;
-  will-change: filter;
-  transition: filter 300ms;
+/* Modern Card Styles */
+.card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 1em var(--secondary-color));
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
+/* Modern Button Styles */
+.button {
+  background: var(--gradient-1);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.button.secondary {
+  background: var(--gradient-2);
+}
+
+/* Header and Navigation */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
   margin-bottom: 2rem;
-  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav {
@@ -31,9 +72,14 @@
   align-items: center;
 }
 
+/* Main Content */
 .main-content {
   text-align: left;
-  padding: 2rem 0;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .section {
@@ -42,6 +88,10 @@
 
 .section-title {
   font-size: 2rem;
+  font-weight: 700;
+  background: var(--gradient-1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 1.5rem;
   position: relative;
   display: inline-block;
@@ -54,9 +104,11 @@
   left: 0;
   width: 40px;
   height: 3px;
-  background-color: var(--secondary-color);
+  background: var(--gradient-1);
+  border-radius: 2px;
 }
 
+/* Grid Layout */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -64,29 +116,201 @@
   margin-top: 2rem;
 }
 
-.footer {
-  margin-top: 4rem;
-  padding: 2rem 0;
-  border-top: 1px solid var(--border-color);
-  color: var(--text-color-light);
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Loading Animation */
+.loading {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-radius: 50%;
+  border-top-color: #6366f1;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   #root {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   
   .header {
     flex-direction: column;
     gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 0.5rem;
   }
   
   .nav {
     flex-direction: column;
-    gap: 1rem;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .nav a {
+    width: 100%;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  
+  .button {
+    width: 100%;
+    min-height: 48px; /* Better touch target */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border-radius: 12px;
+  }
+
+  .card:hover {
+    transform: none; /* Disable hover effect on mobile */
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 12px;
   }
   
   .section-title {
     font-size: 1.5rem;
+    width: 100%;
+    text-align: center;
   }
+
+  .section-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* Improve touch scrolling */
+  .scrollable {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+  }
+
+  /* Adjust loading spinner size */
+  .loading {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+  }
+}
+
+/* Additional mobile breakpoint for very small screens */
+@media (max-width: 380px) {
+  #root {
+    padding: 0.25rem;
+  }
+
+  .header {
+    padding: 0.75rem;
+    margin: 0.25rem;
+  }
+
+  .button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .grid {
+    gap: 0.75rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .button:active {
+    transform: scale(0.98);
+  }
+
+  .card:active {
+    transform: scale(0.99);
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .header {
+    flex-direction: row;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* High pixel density screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .card, .button, .header, .main-content {
+    border-width: 0.5px;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
 }

@@ -37,66 +37,119 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#4caf50",
-      light: "#81c784",
-      dark: "#388e3c",
+      main: "#6366f1", // Modern indigo
+      light: "#818cf8",
+      dark: "#4f46e5",
     },
     secondary: {
-      main: "#ff3333",
-      light: "#ff6666",
-      dark: "#cc0000",
+      main: "#ec4899", // Modern pink
+      light: "#f472b6",
+      dark: "#db2777",
     },
     background: {
-      default: "#ffffff",
-      paper: "#ffffff",
+      default: "#f8fafc",
+      paper: "rgba(255, 255, 255, 0.8)",
     },
     text: {
-      primary: "#000000",
-      secondary: "rgba(0, 0, 0, 0.7)",
+      primary: "#1e293b",
+      secondary: "#64748b",
     },
-    divider: "rgba(0, 0, 0, 0.12)",
+    divider: "rgba(148, 163, 184, 0.12)",
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 600 },
-    h2: { fontWeight: 600 },
-    h3: { fontWeight: 600 },
-    h4: { fontWeight: 600 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
+    fontFamily: '"Plus Jakarta Sans", "Inter", "Roboto", sans-serif',
+    h1: { 
+      fontWeight: 700,
+      letterSpacing: "-0.025em"
+    },
+    h2: { 
+      fontWeight: 700,
+      letterSpacing: "-0.025em"
+    },
+    h3: { 
+      fontWeight: 600,
+      letterSpacing: "-0.025em"
+    },
+    h4: { 
+      fontWeight: 600,
+      letterSpacing: "-0.025em"
+    },
+    h5: { 
+      fontWeight: 600,
+      letterSpacing: "-0.025em"
+    },
+    h6: { 
+      fontWeight: 600,
+      letterSpacing: "-0.025em"
+    },
+    button: {
+      fontWeight: 600,
+      letterSpacing: "0.025em",
+    },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 4,
+          borderRadius: 8,
           textTransform: "none",
-          fontWeight: 500,
-          padding: "8px 16px",
+          fontWeight: 600,
+          padding: "10px 20px",
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          },
+        },
+        contained: {
+          background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+          "&:hover": {
+            background: "linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)",
+          },
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff",
-          boxShadow: "none",
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(148, 163, 184, 0.1)",
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: "#ffffff",
-          borderRight: "1px solid rgba(0, 0, 0, 0.12)",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          backdropFilter: "blur(12px)",
+          borderRight: "1px solid rgba(148, 163, 184, 0.1)",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          backdropFilter: "blur(12px)",
+          borderRadius: 16,
+          border: "1px solid rgba(148, 163, 184, 0.1)",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+          },
         },
       },
     },
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+          borderBottom: "1px solid rgba(148, 163, 184, 0.12)",
         },
       },
     },
@@ -296,35 +349,59 @@ function App() {
             component="main"
             sx={{
               flexGrow: 1,
-              p: 3,
-              width: { sm: `calc(100% - 250px)` },
-              mt: "64px",
+              p: { xs: 1, sm: 2, md: 3 },
+              width: { sm: `calc(100% - ${drawerOpen ? '250px' : '0px'})` },
+              mt: { xs: "56px", sm: "64px" },
+              transition: "all 0.3s ease",
             }}
           >
-            <Container maxWidth="lg">
+            <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
               <Routes>
                 <Route
                   path="/"
                   element={
-                    <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
                       <Box
                         sx={{
                           display: "flex",
+                          flexDirection: { xs: "column", sm: "row" },
                           justifyContent: "space-between",
-                          alignItems: "center",
-                          mb: 3,
+                          alignItems: { xs: "stretch", sm: "center" },
+                          gap: { xs: 2, sm: 0 },
+                          mb: { xs: 2, sm: 3 },
                         }}
                       >
-                        <Typography variant="h4" component="h1">
+                        <Typography 
+                          variant="h4" 
+                          component="h1"
+                          sx={{
+                            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.25rem" },
+                            textAlign: { xs: "center", sm: "left" }
+                          }}
+                        >
                           Campaigns
                         </Typography>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleCreateCampaign}
-                        >
-                          Create Campaign
-                        </Button>
+                        {isMobile ? (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCreateCampaign}
+                            fullWidth
+                            sx={{
+                              py: 1.5,
+                            }}
+                          >
+                            Create Campaign
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCreateCampaign}
+                          >
+                            Create Campaign
+                          </Button>
+                        )}
                       </Box>
                       <CampaignList
                         campaigns={campaigns}

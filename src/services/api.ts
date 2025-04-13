@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Campaign, LinkedInProfile, MessageResponse } from "../types";
 
-const API_BASE_URL = "https://campaign-backend-murex.vercel.app/api";
+const API_BASE_URL = "https://campaign-backend1.vercel.app/api";
 
 
 const api = axios.create({

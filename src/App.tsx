@@ -516,12 +516,12 @@ function App() {
         </Button>
       </Box>
       <List sx={{ px: 1 }}>
-        <NavItem
+        {/* <NavItem
           icon={<DashboardIcon />}
           text="Dashboard"
           to="/"
           onClick={() => isMobile && setDrawerOpen(false)}
-        />
+        /> */}
         <NavItem
           icon={<CampaignIcon />}
           text="Campaigns"

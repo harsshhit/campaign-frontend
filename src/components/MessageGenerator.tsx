@@ -8,141 +8,85 @@ import {
   Button,
   Typography,
   Paper,
-  Grid,
   CircularProgress,
   Alert,
   IconButton,
   Tooltip,
-  Divider,
-  Card,
-  CardContent,
-  CardActions,
+  alpha,
+  useTheme,
 } from "@mui/material";
 import {
   ContentCopy as CopyIcon,
-  Refresh as RefreshIcon,
   Check as CheckIcon,
+  Send as SendIcon,
 } from "@mui/icons-material";
-import { LinkedInProfile } from "../types";
 import { messageApi } from "../services/api";
 
-const profileSchema = z.object({
-  firstName: z
+// Form validation schema
+const messageFormSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  job_title: z
     .string()
-    .min(1, "First name is required")
-    .max(50, "First name must be less than 50 characters"),
-  lastName: z
-    .string()
-    .min(1, "Last name is required")
-    .max(50, "Last name must be less than 50 characters"),
-  currentPosition: z
-    .string()
-    .min(1, "Current position is required")
-    .max(100, "Current position must be less than 100 characters"),
+    .min(1, "Job title is required")
+    .max(100, "Job title is too long"),
   company: z
     .string()
     .min(1, "Company is required")
-    .max(100, "Company must be less than 100 characters"),
-  industry: z
-    .string()
-    .min(1, "Industry is required")
-    .max(50, "Industry must be less than 50 characters"),
+    .max(100, "Company is too long"),
   location: z
     .string()
     .min(1, "Location is required")
-    .max(100, "Location must be less than 100 characters"),
-  summary: z
-    .string()
-    .min(1, "Summary is required")
-    .max(500, "Summary must be less than 500 characters"),
-  experience: z.array(
-    z.object({
-      title: z.string(),
-      company: z.string(),
-      duration: z.string(),
-      description: z.string(),
-    })
-  ),
-  education: z.array(
-    z.object({
-      school: z.string(),
-      degree: z.string(),
-      field: z.string(),
-      graduationYear: z.string(),
-    })
-  ),
-  skills: z.array(z.string()),
+    .max(100, "Location is too long"),
+  summary: z.string().max(500, "Summary must be less than 500 characters"),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type MessageFormData = z.infer<typeof messageFormSchema>;
 
-const sampleProfile: ProfileFormData = {
-  firstName: "John",
-  lastName: "Doe",
-  currentPosition: "Senior Software Engineer",
-  company: "Tech Corp",
-  industry: "Technology",
-  location: "San Francisco, CA",
-  summary:
-    "Experienced software engineer with a passion for building scalable applications.",
-  experience: [
-    {
-      title: "Senior Software Engineer",
-      company: "Tech Corp",
-      duration: "2020 - Present",
-      description: "Leading development of core platform features.",
-    },
-  ],
-  education: [
-    {
-      school: "Stanford University",
-      degree: "Master of Science",
-      field: "Computer Science",
-      graduationYear: "2018",
-    },
-  ],
-  skills: ["JavaScript", "React", "Node.js", "TypeScript"],
-};
-
-interface MessageGeneratorProps {
-  campaignId: string;
-}
-
-export const MessageGenerator: React.FC<MessageGeneratorProps> = ({
-  campaignId,
-}) => {
+export const MessageGenerator = () => {
   const [generatedMessage, setGeneratedMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const theme = useTheme();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    setValue,
+    formState: { errors },
     reset,
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: sampleProfile,
+  } = useForm<MessageFormData>({
+    resolver: zodResolver(messageFormSchema),
+    defaultValues: {
+      name: "",
+      job_title: "",
+      company: "",
+      location: "",
+      summary: "",
+    },
   });
 
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (data: MessageFormData) => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const response = await messageApi.generate(data, campaignId);
+      const response = await messageApi.generate(data);
       setGeneratedMessage(response.data.message);
-    } catch (error) {
-      setError("Failed to generate message. Please try again.");
-      console.error("Error generating message:", error);
+    } catch (error: any) {
+      console.error("Message generation error:", error);
+      if (error.status === 404) {
+        setError(
+          "Server endpoint not found. Please ensure the backend server is running on the correct port."
+        );
+      } else if (error.status >= 500) {
+        setError("Server error. Please try again later.");
+      } else if (error.message) {
+        setError(error.message);
+      } else {
+        setError("Failed to generate message. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadSampleData = () => {
-    reset(sampleProfile);
   };
 
   const copyToClipboard = async () => {
@@ -157,236 +101,201 @@ export const MessageGenerator: React.FC<MessageGeneratorProps> = ({
 
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", p: { xs: 2, sm: 3 } }}>
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: 600, mb: 3, color: "text.primary" }}
-      >
-        LinkedIn Message Generator
-      </Typography>
-
-      <Card
-        elevation={0}
+      {/* Header */}
+      <Box
         sx={{
-          mb: 3,
-          border: "1px solid",
-          borderColor: "divider",
+          mb: 4,
+          p: 3,
           borderRadius: 2,
+          background:
+            "linear-gradient(145deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.05))",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(139, 92, 246, 0.2)",
+          position: "relative",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "4px",
+            background: "linear-gradient(90deg, #6d28d9, #10b981)",
+            zIndex: 1,
+          },
         }}
       >
-        <CardContent>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              Profile Information
-            </Typography>
-            <Button
-              onClick={loadSampleData}
-              variant="outlined"
-              startIcon={<RefreshIcon />}
-              size="small"
-            >
-              Load Sample
-            </Button>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+            background: "linear-gradient(90deg, #8b5cf6, #3b82f6)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            mb: 1,
+          }}
+        >
+          Message Generator
+        </Typography>
+        <Typography color="text.secondary">
+          Generate personalized LinkedIn outreach messages using AI
+        </Typography>
+      </Box>
+
+      {/* Form */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: "divider",
+          background: alpha(theme.palette.background.paper, 0.6),
+          backdropFilter: "blur(10px)",
+        }}
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Box
+            sx={{
+              display: "grid",
+              gap: 3,
+              gridTemplateColumns: { sm: "1fr 1fr" },
+            }}
+          >
+            <TextField
+              label="Name"
+              {...register("name")}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              fullWidth
+              sx={{ gridColumn: { xs: "1/-1", sm: "auto" } }}
+            />
+            <TextField
+              label="Job Title"
+              {...register("job_title")}
+              error={!!errors.job_title}
+              helperText={errors.job_title?.message}
+              fullWidth
+              sx={{ gridColumn: { xs: "1/-1", sm: "auto" } }}
+            />
+            <TextField
+              label="Company"
+              {...register("company")}
+              error={!!errors.company}
+              helperText={errors.company?.message}
+              fullWidth
+              sx={{ gridColumn: { xs: "1/-1", sm: "auto" } }}
+            />
+            <TextField
+              label="Location"
+              {...register("location")}
+              error={!!errors.location}
+              helperText={errors.location?.message}
+              fullWidth
+              sx={{ gridColumn: { xs: "1/-1", sm: "auto" } }}
+            />
+            <TextField
+              label="Summary (Optional)"
+              {...register("summary")}
+              error={!!errors.summary}
+              helperText={errors.summary?.message}
+              multiline
+              rows={4}
+              fullWidth
+              sx={{ gridColumn: "1/-1" }}
+            />
           </Box>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="First Name"
-                  {...register("firstName")}
-                  error={!!errors.firstName}
-                  helperText={errors.firstName?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Last Name"
-                  {...register("lastName")}
-                  error={!!errors.lastName}
-                  helperText={errors.lastName?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Current Position"
-                  {...register("currentPosition")}
-                  error={!!errors.currentPosition}
-                  helperText={errors.currentPosition?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Company"
-                  {...register("company")}
-                  error={!!errors.company}
-                  helperText={errors.company?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Industry"
-                  {...register("industry")}
-                  error={!!errors.industry}
-                  helperText={errors.industry?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Location"
-                  {...register("location")}
-                  error={!!errors.location}
-                  helperText={errors.location?.message}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Summary"
-                  {...register("summary")}
-                  error={!!errors.summary}
-                  helperText={errors.summary?.message}
-                  multiline
-                  rows={4}
-                  fullWidth
-                  variant="outlined"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 1,
-                    },
-                  }}
-                />
-              </Grid>
-            </Grid>
-
+          <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
             <Button
               type="submit"
               variant="contained"
-              color="primary"
-              disabled={isSubmitting}
+              disabled={loading}
+              startIcon={
+                loading ? <CircularProgress size={20} /> : <SendIcon />
+              }
               sx={{
-                mt: 2,
-                borderRadius: 1,
-                textTransform: "none",
-                px: 2,
-                minWidth: 150,
+                py: 1.5,
+                px: 4,
+                background: "linear-gradient(45deg, #6d28d9, #8b5cf6)",
               }}
             >
-              {isSubmitting ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Generate Message"
-              )}
+              {loading ? "Generating..." : "Generate Message"}
             </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {error && (
-        <Alert
-          severity="error"
-          sx={{ mb: 3 }}
-          action={
-            <IconButton
-              aria-label="retry"
-              color="inherit"
-              size="small"
-              onClick={() => setError(null)}
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={() => {
+                reset();
+                setGeneratedMessage("");
+                setError(null);
+              }}
+              sx={{ py: 1.5, px: 4 }}
             >
-              <RefreshIcon fontSize="inherit" />
-            </IconButton>
-          }
-        >
+              Clear
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+
+      {/* Error Message */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
+      {/* Generated Message */}
       {generatedMessage && (
-        <Card
+        <Paper
           elevation={0}
           sx={{
-            border: "1px solid",
-            borderColor: "divider",
+            p: 3,
             borderRadius: 2,
+            border: "1px solid",
+            borderColor: alpha(theme.palette.primary.main, 0.2),
+            background: alpha(theme.palette.background.paper, 0.6),
+            backdropFilter: "blur(10px)",
           }}
         >
-          <CardContent>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Generated Message
-              </Typography>
-              <Tooltip title={copied ? "Copied!" : "Copy to clipboard"}>
-                <IconButton
-                  onClick={copyToClipboard}
-                  size="small"
-                  sx={{
-                    color: copied ? "success.main" : "primary.main",
-                  }}
-                >
-                  {copied ? <CheckIcon /> : <CopyIcon />}
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Typography
-              variant="body1"
-              sx={{
-                whiteSpace: "pre-wrap",
-                lineHeight: 1.6,
-                color: "text.secondary",
-              }}
-            >
-              {generatedMessage}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Generated Message
             </Typography>
-          </CardContent>
-        </Card>
+            <Tooltip title={copied ? "Copied!" : "Copy to clipboard"}>
+              <IconButton
+                onClick={copyToClipboard}
+                size="small"
+                sx={{
+                  color: copied ? "success.main" : "primary.main",
+                  transition: "all 0.2s",
+                }}
+              >
+                {copied ? <CheckIcon /> : <CopyIcon />}
+              </IconButton>
+            </Tooltip>
+          </Box>
+          <Typography
+            variant="body1"
+            sx={{
+              whiteSpace: "pre-wrap",
+              p: 2,
+              borderRadius: 1,
+              bgcolor: alpha(theme.palette.primary.main, 0.05),
+              border: "1px solid",
+              borderColor: alpha(theme.palette.primary.main, 0.1),
+            }}
+          >
+            {generatedMessage}
+          </Typography>
+        </Paper>
       )}
     </Box>
   );

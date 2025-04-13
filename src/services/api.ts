@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Campaign, LinkedInProfile, MessageResponse } from "../types";
 
-const API_BASE_URL = "https://campaign-backend1.vercel.app/api";
-
+// const API_BASE_URL = "https://campaign-backend1.vercel.app/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -69,8 +69,13 @@ export const campaignApi = {
 };
 
 export const messageApi = {
-  generate: (profile: LinkedInProfile, campaignId: string) =>
-    api.post<MessageResponse>("/personalized-message", { profile, campaignId }),
+  generate: (data: {
+    name: string;
+    job_title: string;
+    company: string;
+    location: string;
+    summary?: string;
+  }) => api.post<{ message: string }>("/personalized-message", data),
 };
 
 // Helper function to handle API errors

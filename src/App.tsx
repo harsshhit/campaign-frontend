@@ -599,6 +599,21 @@ function App() {
                 </IconButton>
               )}
 
+              {!isMobile && (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    background: "linear-gradient(90deg, #8b5cf6, #3b82f6)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontWeight: 700,
+                    mr: 2
+                  }}
+                >
+                  Outflo AI Campaign Manager
+                </Typography>
+              )}
+
               {isMobile && <GlowingLogo />}
 
               <Box sx={{ flexGrow: 1 }} />
